@@ -1,7 +1,6 @@
 # Files
 
 ## Handig
-- BBA cheatsheet
 - BBA pinout: https://e2cre8.be/wp-content/uploads/2015/12/BBA-PINOUT.png
 - BBA cheatsheet: https://e2cre8.be/wp-content/uploads/2015/12/Arduino-BBA-Cheat-Sheet.pdf
 - H-brug dataspecs: https://www.handsontec.com/dataspecs/module/BTS7960%20Motor%20Driver.pdf
