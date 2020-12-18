@@ -32,7 +32,7 @@ const String postForms = "<html>\
   <body>\
     <h1>'plain' data naar /postplain/</h1><br>\
     <form method=\"post\" enctype=\"text/plain\" action=\"/postplain/\">\
-      <input type=\"text\" name=\'\"\' value=\'\"}\'><br>\
+      <input type=\"text\" name=\'\"\' value=\'\waarde\'><br>\
       <input type=\"submit\" value=\"Verzend\">\
     </form>\
     <h1>'form' data naar /postform/</h1><br>\
@@ -108,6 +108,7 @@ void setup(void) {
   digitalWrite(led, 0);         // led uit
   delay(1000);                  // wacht 1 seconde
   Serial.begin(115200);         // maak seriële poort aan met baud 115200 (baud = aantal signaalwisselingen per seconde)
+  /* ^ VERANDER OOK BAUD IN SERIELE MONITOR ^ */
   Serial.println();             // print nieuwe lijn op seriële poort
   Serial.print("Configuring access point...");  // print ""
   WiFi.softAP(ssid, password);  // start een toeganspunt (AP) op met naam en wachtwoord die we eerder instelden
