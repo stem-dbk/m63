@@ -30,15 +30,15 @@ const String postForms = "<html>\
     </style>\
   </head>\
   <body>\
-    <h1>POST plain text to /postplain/</h1><br>\
+    <h1>'plain' data naar /postplain/</h1><br>\
     <form method=\"post\" enctype=\"text/plain\" action=\"/postplain/\">\
-      <input type=\"text\" name=\'{\"hello\": \"world\", \"trash\": \"\' value=\'\"}\'><br>\
-      <input type=\"submit\" value=\"Submit\">\
+      <input type=\"text\" name=\'\"\' value=\'\"}\'><br>\
+      <input type=\"submit\" value=\"Verzend\">\
     </form>\
-    <h1>POST form data to /postform/</h1><br>\
+    <h1>'form' data naar /postform/</h1><br>\
     <form method=\"post\" enctype=\"application/x-www-form-urlencoded\" action=\"/postform/\">\
       <input type=\"text\" name=\"hello\" value=\"world\"><br>\
-      <input type=\"submit\" value=\"Submit\">\
+      <input type=\"submit\" value=\"Verzend\">\
     </form>\
   </body>\
 </html>";
@@ -75,7 +75,7 @@ void handleForm() {
     String message = "POST form was:\n";
     for (uint8_t i = 0; i < server.args(); i++) {
       Serial.println(i);  // REV ENG
-      Serial.print("" + server.argName(i) + " " + server.arg(i)); // REV ENG
+      Serial.print("" + server.argName(i) + " " + server.arg(i)); // REV ENG : voor ieder arg (argument?) wordt de naam en data verkregen
       message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
     }
     server.send(200, "text/plain", message);
