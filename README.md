@@ -1,5 +1,5 @@
-# M63 (My Add On)
-Groep M63 ontwikkelt een automatisch bewegend model dat de MySleeve van My Add On demonstreert.
+# M63
+Groep M63 ontwikkelt een automatisch bewegend model dat de werking van de MySleeve demonstreert.
 
 ## Inhoud
 - Arduinoprogramma om motor aan te sturen
