@@ -1,27 +1,41 @@
-/* WiFi toegangspunt aanmaken en webserver draaien */
+/* 
+ *  Doel: WiFi toegangspunt aanmaken en webserver draaien om builtin LED te laten branden
+ *  Benodigdheden: ESP8266 (hardware), board beheer: http://arduino.esp8266.com/stable/package_esp8266com_index.json (software)
+ *  Meer info: https://stem-dbk.github.io/m63
+ *  
+ *  communicatie tussen Arduino's nog niet gelukt
+ */
 
 /* biblioteheken die de code vergemakelijken (voorgeprogrammeerde functies) */
 #include <ESP8266WiFi.h>        // algemene ESP8266 functies
-#include <WiFiClient.h>         // Client functies (nodig?)
 #include <ESP8266WebServer.h>   // Server functies
-#include <ESP8266mDNS.h>        // DNS = Domain Name System
+
+/* bibliotheek voor communicatie tussen Arduino's */
+//#include <Wire.h>
+
+/* definieer het addres voor I2C communicatie */
+//#define I2CAddressESPWifi 8
 
 /* vervang volgende woorden wanneer ze in het programma voorkomen */
-#ifndef APSSID                              // check of APPSSID al is gedefinieerd
+#ifndef APSSID                              // check of APPSSID al is gedefinieerd, als dat niet zo is doe het volgende:
 #define APSSID "My Add On - Demo-Machine"   // definieer SSID (WiFi-naam)
-#define APPSK  "MAOdoorDBK"                 // definieer APPSK (wachtwoord, PSK encryptie)
+#define APPSK  "MAOdoorDBK"                 // definieer APPSK (wachtwoord, PSK-encryptie)
 #endif                                      // einde van de check
 
 /* maak ssid en password pointers om later in functies te gebruiken */
-const char *ssid = APSSID;      // als ssid in een functie terecht komt, verwijst het naar APSSID
-const char *password = APPSK;   // als password in een functie terecht komt, verwijst het naar APPSK
+const char *ssid = APSSID;      // als ssid in een functie terecht komt, verwijst het naar variabele APSSID
+const char *password = APPSK;   // als password in een functie terecht komt, verwijst het naar variabele APPSK
 
 ESP8266WebServer server(80);    // we starten een server op poort 80 (standaard voor HTTP-connectie)
-                                // standaard IP van de ESP is http://192.168.4.1 (server hier te vinden)
+                                // standaard IP van de ESP is http://192.168.4.1 (webserver hier te vinden)
 
-const int led = LED_BUILTIN;    // variabele led gelijkstellen aan LED_BUILTIN = led ingebouwd in de ESP
+const int led = LED_BUILTIN;    // variabele led gelijkstellen aan LED_BUILTIN = led ingebouwd in de ESP = 2
 
-/* HTML-code met formulier (onveranderlijke variabele met naam 'postForms') */
+/* opnieuw voor I2C-communicatie */
+String bericht;                 // maak variabele "bericht" aan als string (letters)
+//boolean statusLed;
+
+/* HTML-code met formulier (onveranderlijke variabele met naam 'htmlData') */
 const String htmlData = "<html>\
   <head>\
     <title>My Add On | Demo-Machine | bediening</title>\
@@ -41,30 +55,44 @@ const String htmlData = "<html>\
   </body>\
 </html>";
 
-/* we maken een functie aan om aan te geven wat de server moet versturen en brengen de led op de ESP op nul*/
+
+/* we maken een functie aan om aan te geven wat de server moet versturen wanneer die functie wordt aangeroepen*/
 void handleRoot() {
-  server.send(200, "text/html", htmlData);   // verstuur HTTP-status 200 (OK) met HTML-code opgeslagenn in 'htmlData'
+  server.send(200, "text/html", htmlData);  // verstuur HTTP-status 200 (OK) met HTML-code opgeslagen in 'htmlData'
 }
 
 /* verwerk POST LEDaan bij aanvraag /LEDaan */
 void handleLEDaan() {
   digitalWrite(led, 0);                     // leg led aan
-  Serial.println("LED aan");                // print dat de led aan is
-  server.sendHeader("Location", "/");       // ga terug naar homepage (/)
+  
+  bericht = "Led is aangestoken";           // verander inhoud variabele "bericht"
+
+  /* I2C-communicatie */
+  /*Wire.beginTransmission(I2CAddressESPWifi);
+  Wire.write("testaan");
+  Wire.endTransmission();*/
+
+  Serial.println(bericht);                  // print het bericht
+  server.sendHeader("Location", "/");       // ga terug naar homepage (/) van de webserver
   server.send(303);                         // verstuur HTTP-status 303 (redirect)
 }
 
 /* verwerk POST LEDuit bij aanvraag /LEDuit */
 void handleLEDuit() {
   digitalWrite(led, 1);                     // leg led uit
-  Serial.println("LED uit");                // print dat de led uit is
-  server.sendHeader("Location", "/");       // ga terug naar homepage (/)
+  bericht = "Led is uitgeschakeld";
+
+  /* I2C-communicatie */
+  //Wire.write("testuit");
+  
+  Serial.println(bericht);                  // print het bericht
+  server.sendHeader("Location", "/");       // ga terug naar homepage (/) van de webserver
   server.send(303);                         // verstuur HTTP-status 303 (redirect)
 }
 
-/* wat te doen als niet gevonden */
+/* wat te doen als aanvrag niet gevonden */
 void handleNotFound() {
-  digitalWrite(led, 1);
+  //digitalWrite(led, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -76,43 +104,45 @@ void handleNotFound() {
   for (uint8_t i = 0; i < server.args(); i++) {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
-  server.send(404, "text/plain", message);
-  digitalWrite(led, 0);
+  Serial.print(message);
+  server.send(404, "text/plain", message);  // verstuur HTTP-status 404 (not found)
+  //digitalWrite(led, 0);                     // leg led aan
 }
+
+/* I2C- communicatie */
+/*void stuurBericht() {
+  Wire.write("test");
+  Serial.print("'stuurBericht' is geactiveerd");
+}*/
 
 void setup(void) {
   pinMode(led, OUTPUT);         // led is output
-  delay(1000);                  // wacht 1 seconde
-  Serial.begin(115200);         // maak seriële poort aan met baud 115200 (baud = aantal signaalwisselingen per seconde)
+  
+  /* I2C-communicatie */
+  //Wire.begin(0, 2);
+  
+  Serial.begin(115200);         // zet seriële poort met baud rate 115200 op (baud = aantal signaalwisselingen per seconde)
   /* ^ VERANDER OOK BAUD IN SERIELE MONITOR ^ */
   Serial.println();             // print nieuwe lijn op seriële poort
   Serial.print("Configuring access point...");  // print ""
-  WiFi.softAP(ssid, password);  // start een toeganspunt (AP) op met naam en wachtwoord die we eerder instelden
+  WiFi.softAP(ssid, password);  // start een toeganspunt (AP) op met naam en wachtwoord die we eerder configureerden
 
-  IPAddress myIP = WiFi.softAPIP();         // verkrijg IP van het toegangspunt
+  IPAddress myIP = WiFi.softAPIP();         // verkrijg IP van het toegangspunt en stel die in als variabele myIP
   Serial.print("AP IP address: ");          // print ""
   Serial.println(myIP);                     // print IP-addres van het toeganspunt
-  /*server.on("/", handleRoot);
-  server.begin();
-  Serial.println("HTTP server started");*/
 
-  /* DNS (netwerk gedeelte) */
-  if (MDNS.begin("esp8266")) {
-    Serial.println("MDNS responder started");
-  }
+  server.on("/", HTTP_GET, handleRoot);             // wanneer pagina (home) "/" wordt aangeroepen via webserver, voer functie handleRoot uit
 
-  server.on("/", HTTP_GET, handleRoot);
+  server.on("/LEDaan", HTTP_POST, handleLEDaan);    // wanneer pagina "/LEDaan" wordt aangeroepen via webserver, voer functie handleLEDaan uit
 
-  server.on("/LEDaan", HTTP_POST, handleLEDaan);
+  server.on("/LEDuit", HTTP_POST, handleLEDuit);    // wanneer pagina "/LEDuit" wordt aangeroepen via webserver, voer functie handleLEDuit uit
 
-  server.on("/LEDuit", HTTP_POST, handleLEDuit);
+  server.onNotFound(handleNotFound);                // wanneer aanvraag niet gevonden wordt, voer functie "handleNotFound" uit
 
-  server.onNotFound(handleNotFound);
-
-  server.begin();
-  Serial.println("HTTP server started");
+  server.begin();                                   // start server
+  Serial.println("HTTP server started");            // print op een nieuwe lijn dat de server gestart is
 }
 
 void loop(void) {
-  server.handleClient();
+  server.handleClient();                            // houd de server constant in de gaten
 }
