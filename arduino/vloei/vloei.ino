@@ -12,22 +12,56 @@ void setup() {
 
 // dit wordt herhaald
 void loop() {
-  int x; // initialiseer x variabele
+  int x;
 
   // vooruit
-  for(x = 0; x <= 1024; x+=3){
-    analogWrite(LPWM_Output, x);
-    analogWrite(RPWM_Output, 0);
+  draai(true, 0, true);
+  draai(true, 255, false);
+  delay(1000);
+  
+  for(x = 255; x >= 0; x -= 20){
+    draai(true, x, false);
     Serial.print(x);
     Serial.print("\nVooruit \n");
-    delay(25);
+    delay(100);
   }
+  
   // achteruit
-   for(x = 0; x <= 1024; x+=3){
-    analogWrite(LPWM_Output, x);
-    analogWrite(RPWM_Output, 0);
+  draai(false, 0, true);
+  draai(false, 255, false);
+  delay(1000);
+    for(x = 255; x >= 0; x -= 20){
+    draai(false, x, false);
     Serial.print(x);
-    Serial.print("\nAchteruit \n");
-    delay(25);
+    Serial.print("\nVooruit \n");
+    delay(100);
+    }
+}
+
+int motor(int vsnel, int asnel){
+  analogWrite(LPWM_Output, vsnel);
+  analogWrite(RPWM_Output, asnel);
+}
+
+int draai(int vooruit, int snelheid, int vloei) {
+  if (vooruit == true){
+    if (vloei == true){
+      for(snelheid = 1; snelheid <= 255; snelheid += 10){
+        motor(snelheid, 0);
+      }
+    }
+    else {
+        motor(snelheid, 0);
+    }
+  }
+  else {
+    if (vloei == true){
+      for(snelheid = 1; snelheid <= 255; snelheid += 10){
+        motor(0, snelheid);
+      }
+    }
+    else {
+      motor(0, snelheid);
+    }
   }
 }
