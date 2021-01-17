@@ -1,3 +1,8 @@
+/*
+ * deze code bevat functies om onnodige herhaling te vermijden
+ */
+
+
 // we geven een naam aan de pinnen om het programma overzichtelijk te houden
 int RPWM_Output = 5;  // Forward Level PWM output pin, geconnecteerd met de H-brug
 int LPWM_Output = 6;  // Reverse Level PWM output pin, geconnecteerd met de H-brug
@@ -12,7 +17,7 @@ void setup() {
 
 // dit wordt herhaald
 void loop() {
-  int x;
+  int x;                                    // initializeer variabele x
 
   // vooruit
   draai(true, 0, true);
@@ -38,30 +43,34 @@ void loop() {
     }
 }
 
+// functie om motor te laten draaien met parameters (vsnel en asnel, die worden geinitializeerd)
 int motor(int vsnel, int asnel){
-  analogWrite(LPWM_Output, vsnel);
-  analogWrite(RPWM_Output, asnel);
+  analogWrite(LPWM_Output, vsnel);            // draai vooruit aan snelheid 'vsnel'
+  analogWrite(RPWM_Output, asnel);            // draai achteruit aan snelheid 'asnel'
 }
 
+// functie om motor vooruit of achteruit te laten draaien aan bepaalde snelheid
+// en hem al dan niet vloeiend laten bewegen volgens parameters (vooruit, snelheid, vloei)
 int draai(int vooruit, int snelheid, int vloei) {
-  if (vooruit == true){
-    if (vloei == true){
-      for(snelheid = 1; snelheid <= 255; snelheid += 10){
-        motor(snelheid, 0);
+  if (vooruit == true){                                         // als waarde vooruit true is
+    if (vloei == true){                                         // als waarde vloei true is
+      // doe het volgende voor iedere snelheid tot snelheid < of = 255 en pas snelheid telkens met 10 aan
+      for(snelheid = 1; snelheid <= 255; snelheid += 10){       
+        motor(snelheid, 0);                                     // laat motor aan die snelheid vooruit draaien
       }
     }
-    else {
-        motor(snelheid, 0);
+    else {                                                      // als waarde vloei niet true is
+        motor(snelheid, 0);                                     // draai aan vaste snelheid
     }
   }
-  else {
-    if (vloei == true){
-      for(snelheid = 1; snelheid <= 255; snelheid += 10){
-        motor(0, snelheid);
+  else {                                                        // als waarde vooruit niet true is
+    if (vloei == true){                                         // als waarde vloei true is
+      for(snelheid = 1; snelheid <= 255; snelheid += 10){       // stel snelheid vloeibaar in
+        motor(0, snelheid);                                     // draai achteruit aan snelheid
       }
     }
-    else {
-      motor(0, snelheid);
+    else {                                                      // als waarde vloei niet true is (false)
+      motor(0, snelheid);                                       // draai achteruit aan vaste snelheid
     }
   }
 }
