@@ -1,14 +1,17 @@
 
-const int IN_PIN =  21; 
+const int eind1 = 21;   // pin van input eerste eindeloopschakelaar
+const int eind2 = 22;   // pin van input tweede eindeloopschakelaar
 
-// maak variabele aan voor status shakelaar
-char eindschakelStatus = 0;
+// maak variabele aan voor status shakelaars
+char eind1Status = 0;
+char eind2Status = 0;
 
 // this setup function runs once when you press reset or power the board
 void setup() 
 {
   // initialize digital pin as input or output
-  pinMode(IN_PIN, INPUT);
+  pinMode(eind1, INPUT);
+  pinMode(eind2, INPUT);
   Serial.begin(9600);
 }
 
@@ -16,15 +19,22 @@ void setup()
 void loop() 
 {
   // read the state of the input pin :
-  eindschakelStatus = digitalRead(IN_PIN);
+  eind1Status = digitalRead(eind1);
+  eind2Status = digitalRead(eind2);
 
-  // if the input pin is high
-  if (eindschakelStatus == HIGH) {
-    // turn LED on:
-    Serial.println("aan");
+  // als de input van 1 HIGH is
+  if (eind1Status == HIGH) {
+    Serial.println("eind 1 aan");   // toon op scherm ..
   }
-  else { // if the input pin is low
-    // turn LED off:
-    Serial.println("uit");
+  // als de input van 1 LOW is
+  else { 
+    Serial.println("eind 2 uit");   // toon op scherm ..
  }
+
+  if (eind2Status == HIGH) {
+    Serial.print("eind 2 aan");
+  }
+  else {
+    Serial.print("eind 2 uit");
+  }
 }
