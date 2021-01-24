@@ -26,15 +26,9 @@ void loop()
   if (eind1Status == HIGH) {
     Serial.println("eind 1 aan");   // toon op scherm ..
   }
-  // als de input van 1 LOW is
-  else { 
-    Serial.println("eind 2 uit");   // toon op scherm ..
- }
 
   if (eind2Status == HIGH) {
-    Serial.print("eind 2 aan");
+    Serial.println("eind 2 aan");
   }
-  else {
-    Serial.print("eind 2 uit");
-  }
+  
 }
