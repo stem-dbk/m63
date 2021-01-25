@@ -1,20 +1,19 @@
-/*
- * deze code bevat functies om onnodige herhaling te vermijden
- */
-
+ /*
+  * deze code bevat functies om onnodige herhaling te vermijden
+  */
 
 // we geven een naam aan de pinnen om het programma overzichtelijk te houden
-int RPWM_Output = 5;  // Forward Level PWM output pin, geconnecteerd met de H-brug
-int LPWM_Output = 6;  // Reverse Level PWM output pin, geconnecteerd met de H-brug
+int RPWM_Output = 5;      // Forward Level PWM output pin, geconnecteerd met de H-brug
+int LPWM_Output = 6;      // Reverse Level PWM output pin, geconnecteerd met de H-brug
 
-const int eind1 = 21;   // pin van input eerste eindeloopschakelaar
-const int eind2 = 22;   // pin van input tweede eindeloopschakelaar
+const int eind1 = 21;     // pin van input eerste eindeloopschakelaar
+const int eind2 = 22;     // pin van input tweede eindeloopschakelaar
 
 // maak variabele aan voor status shakelaars
-char eind1Status = 0;
-char eind2Status = 0;
+char eind1Status = 0;     // variabele voor status eindeloopschakelaar 1
+char eind2Status = 0;     // variabele voor status eindeloopschakelaar 2
 
-int x;
+int stand;                // maak variabele "stand" aan voor de status van de eindeloopschakelaars
 
 // eerste wat het programma eenmalig doet
 void setup() {
@@ -22,51 +21,52 @@ void setup() {
   pinMode(RPWM_Output, OUTPUT);
   pinMode(LPWM_Output, OUTPUT);
 
-  pinMode(eind1, INPUT);
-  pinMode(eind2, INPUT);
-  Serial.begin(9600);
+  // de eindeloopschakelaar geeft ons een bepaalde input, dus we stellen deze in als input
+  pinMode(eind1, INPUT);    // eindeloopschakelaar 1
+  pinMode(eind2, INPUT);    // eindeloopschakelaar 2
 
-  if(eind1Status == 0 && eind2Status == 0){
-    while(eind1Status != 1){
-      draai(true, 100, false);                // draai vooruit om krukken in beginstand te zetten
-    }
-  }
+  // we starten een seriele monitor om te zien wat het programma doet
+  Serial.begin(9600);
 }
 
 // dit wordt herhaald
 void loop() {
 
-  if(eind1Status == 1) {                      // als eindeloopschakelaar 1 wordt ingedrukt, draai vooruit
-    // vooruit
-    draai(true, 0, true);                     // vloeiend vooruit
-    draai(true, 255, false);                  // 1s op vaste snelheid
-    delay(1000);    
+  draai(true, 200, false);          // draai eerst vooruit aan snelheid 200
 
-    // vooruit afremmen
-    for(x = 255; x >= 0; x -= 20){
-      draai(true, x, false);
-      Serial.print(x);
-      Serial.print("\nVooruit \n");
-      delay(100);
-    }
+  // als eindeloopschakelaar 1 wordt ingedrukt (1, HIGH), verander variabele "stand" naar vooruit
+  if(digitalRead(eind1) == 1) {
+    stand = "vooruit"; 
   }
 
-  if(eind2Status == 1) {                      // als eindeloopschakelaar 2 wordt ingedrukt, draai achteruit
-    // achteruit
-    draai(false, 0, true);
-    draai(false, 255, false);
-    delay(1000);
+  // als eindeloopschakelaar 2 wordt ingedrukt (1, HIGH), verander variabele "stand" naar achteruit
+  if(digitalRead(eind2) == 1) {
+    stand = "achteruit";
+  }
 
-    // achteruit remmend
-    for(x = 255; x >= 0; x -= 20){
-      draai(false, x, false);
-      Serial.print(x);
-      Serial.print("\nVooruit \n");
-      delay(100);
-      }    
+  // voer het volgende uit zolang de stand gelijk is aan "vooruit"
+  while(stand == "vooruit"){
+    draai(true, 255, false);        // draai vooruit aan snelheid 255
+    Serial.println("vooruit");      // print op de seriele monitor "vooruit"
+    if(digitalRead(eind2) == 1){    // als de tweede eindeloopschakelaar wordt ingedrukt
+      stand = "achteruit";          // verander de stand naar "achteruit"
+    }                               // de while-lus wordt dan ook afgebroken
+  }
+
+  // voer het volgende uit zolang de stand gelijk is aan "achteruit"
+  while(stand == "achteruit"){
+    draai(false, 50, false);        // draai achteruit aan snelheid 50
+    Serial.println("achteruit");    // print op de seriele monitor "achteruit"
+    if(digitalRead(eind1) == 1){    // als de eerste eindeloopschakelaar opnieuw wordt ingedrukt
+      stand = "vooruit";            // verander de stand naar "vooruit"
+    }                               // de while-lus wordt dan ook afgebroken
   }
 }
 
+/*
+ * we maken gebruik van eigen functies om het programma flexibeler en eenvoudiger te maken
+ * het verandert niets aan de werking
+ */
 
 // functie om motor te laten draaien met parameters (vsnel en asnel, die worden geinitializeerd)
 int motor(int vsnel, int asnel){
@@ -85,7 +85,7 @@ int draai(int vooruit, int snelheid, int vloei) {
       }
     }
     else {                                                      // als waarde vloei niet true is
-        motor(snelheid, 0);                                     // draai aan vaste snelheid
+        motor(snelheid, 0);                                     // draai aan vaste snelheid meegegeven in parameter
     }
   }
   else {                                                        // als waarde vooruit niet true is
