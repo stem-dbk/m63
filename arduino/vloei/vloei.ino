@@ -14,6 +14,7 @@ char eind1Status = 0;     // variabele voor status eindeloopschakelaar 1
 char eind2Status = 0;     // variabele voor status eindeloopschakelaar 2
 
 int stand;                // maak variabele "stand" aan voor de status van de eindeloopschakelaars
+int hasRun = false;       // maak variabele aan om te checken of programma al gedraaid heeft
 
 // eerste wat het programma eenmalig doet
 void setup() {
@@ -32,7 +33,7 @@ void setup() {
 // dit wordt herhaald
 void loop() {
 
-  draai(true, 200, false);          // draai eerst vooruit aan snelheid 200
+  draai(false, 20, false);          // draai eerst achteruit aan snelheid 20
 
   // als eindeloopschakelaar 1 wordt ingedrukt (1, HIGH), verander variabele "stand" naar vooruit
   if(digitalRead(eind1) == 1) {
@@ -46,19 +47,31 @@ void loop() {
 
   // voer het volgende uit zolang de stand gelijk is aan "vooruit"
   while(stand == "vooruit"){
+    if(hasRun == false) {           // als hasRun false is
+      vloeiStop(50 ,"achteruit");   // stop vloeiend van de "achteruit" stand, startend met snelheid 50
+      draai(true, 0, true);         // start vloeiend vooruit tot snelheid 255
+      hasRun = true;                // verander hasRun naar true, om niet nog een keer vloeiend
+    }                               // te draaien vanaf snelheid 0
     draai(true, 255, false);        // draai vooruit aan snelheid 255
     Serial.println("vooruit");      // print op de seriele monitor "vooruit"
     if(digitalRead(eind2) == 1){    // als de tweede eindeloopschakelaar wordt ingedrukt
       stand = "achteruit";          // verander de stand naar "achteruit"
+      hasRun = false;               // verander hasRun naar false om volgende keer vloeiend te draaien
     }                               // de while-lus wordt dan ook afgebroken
   }
 
   // voer het volgende uit zolang de stand gelijk is aan "achteruit"
   while(stand == "achteruit"){
+    if(hasRun == false){            // als hasRun false is
+      vloeiStop(255, "achteruit");  // stop vloeiend van de "vooruit" stand, startend met snelheid 255
+      draai(false, 0, true);        // start vloeiend achteruit tot snelheid 50
+      hasRun = true;                // verander hasRun naar true, om niet nog een keer vloeiend
+    }                               // te draaien vanaf snelheid 0
     draai(false, 50, false);        // draai achteruit aan snelheid 50
     Serial.println("achteruit");    // print op de seriele monitor "achteruit"
     if(digitalRead(eind1) == 1){    // als de eerste eindeloopschakelaar opnieuw wordt ingedrukt
       stand = "vooruit";            // verander de stand naar "vooruit"
+      hasRun = false;               // verander hasRun naar false om volgende keer vloeiend te draaien
     }                               // de while-lus wordt dan ook afgebroken
   }
 }
@@ -90,7 +103,7 @@ int draai(int vooruit, int snelheid, int vloei) {
   }
   else {                                                        // als waarde vooruit niet true is
     if (vloei == true){                                         // als waarde vloei true is
-      for(snelheid = 1; snelheid <= 255; snelheid += 10){       // stel snelheid vloeibaar in
+      for(snelheid = 1; snelheid <= 50; snelheid += 5){         // stel snelheid vloeibaar in
         motor(0, snelheid);                                     // draai achteruit aan snelheid
       }
     }
@@ -99,3 +112,15 @@ int draai(int vooruit, int snelheid, int vloei) {
     }
   }
 } 
+
+// een functie om vloeiend te stoppen
+int vloeiStop(int remSnelheid, int remStand){
+  // doe het volgende voor iedere remSnelheid tot remSnelheid < of = 0 en verminder telkens met 10
+  for(remSnelheid; remSnelheid <= 0; remSnelheid -=10){
+    if(remStand == "vooruit"){                                  // als remStand "vooruit" is
+      motor(remSnelheid, 0);                                    // draai met remSnelheid vooruit
+    } else if (remStand == "achteruit"){                        // als remStand "achteruit" is
+      motor(0, remSnelheid);                                    // draai met remSnelheid achteruit
+    }
+  }
+}
