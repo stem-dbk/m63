@@ -8,3 +8,5 @@ Op deze site vind je extra informatie over WiFi en Arduino.
 
 Code is te vinden op Github:
 [stem-dbk](https://github.com/stem-dbk) 
+
+![logo](/media/logo.png) 
