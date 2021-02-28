@@ -33,44 +33,47 @@ void setup() {
 // dit wordt herhaald
 void loop() {
 
-  draai(false, 20, false);          // draai eerst achteruit aan snelheid 20
+  draai("omlaag", 50, false, 0);          // draai eerst omlaag aan snelheid 50
 
-  // als eindeloopschakelaar 1 wordt ingedrukt (1, HIGH), verander variabele "stand" naar vooruit
+  // als eindeloopschakelaar 1 wordt ingedrukt (1, HIGH), verander variabele "stand" naar omhoog
   if(digitalRead(eind1) == 1) {
-    stand = "vooruit"; 
+    stand = "omhoog"; 
   }
 
-  // als eindeloopschakelaar 2 wordt ingedrukt (1, HIGH), verander variabele "stand" naar achteruit
+  // als eindeloopschakelaar 2 wordt ingedrukt (1, HIGH), verander variabele "stand" naar omlaag
   if(digitalRead(eind2) == 1) {
-    stand = "achteruit";
+    stand = "omlaag";
   }
 
-  // voer het volgende uit zolang de stand gelijk is aan "vooruit"
-  while(stand == "vooruit"){
+  // voer het volgende uit zolang de stand gelijk is aan "omhoog"
+  // fout met hasRun = gaat direct over naar hasRun = true en stopt (?) (nee normaal niet)
+  while(stand == "omhoog"){
     if(hasRun == false) {           // als hasRun false is
-      vloeiStop(50 ,"achteruit");   // stop vloeiend van de "achteruit" stand, startend met snelheid 50
-      draai(true, 0, true);         // start vloeiend vooruit tot snelheid 255
+      Serial.println(hasRun);
+      vloeiStop(50 ,"omlaag");      // stop vloeiend van de "omlaag" stand, startend met snelheid 50
+      draai(stand, 0, true, 150);        // start vloeiend omhoog tot snelheid 255
       hasRun = true;                // verander hasRun naar true, om niet nog een keer vloeiend
     }                               // te draaien vanaf snelheid 0
-    draai(true, 255, false);        // draai vooruit aan snelheid 255
-    Serial.println("vooruit");      // print op de seriele monitor "vooruit"
+    draai(stand, 150, false, 0);       // draai omhoog aan snelheid 255
+    /*Serial.println(stand);          // print de stand op de seriële monitor*/
     if(digitalRead(eind2) == 1){    // als de tweede eindeloopschakelaar wordt ingedrukt
-      stand = "achteruit";          // verander de stand naar "achteruit"
-      hasRun = false;               // verander hasRun naar false om volgende keer vloeiend te draaien
+      stand = "omlaag";             // verander de stand naar "omlaag"
+      hasRun = false;               // verander hasRun naar false om volgende keer vloeiend te stoppen
     }                               // de while-lus wordt dan ook afgebroken
   }
 
-  // voer het volgende uit zolang de stand gelijk is aan "achteruit"
-  while(stand == "achteruit"){
+  // voer het volgende uit zolang de stand gelijk is aan "omlaag"
+  while(stand == "omlaag"){
     if(hasRun == false){            // als hasRun false is
-      vloeiStop(255, "achteruit");  // stop vloeiend van de "vooruit" stand, startend met snelheid 255
-      draai(false, 0, true);        // start vloeiend achteruit tot snelheid 50
+      Serial.println(hasRun);
+      vloeiStop(150, "omhoog");     // stop vloeiend van de "omhoog" stand, startend met snelheid 255
+      draai(stand, 0, true, 50);        // start vloeiend achteruit tot snelheid 50
       hasRun = true;                // verander hasRun naar true, om niet nog een keer vloeiend
     }                               // te draaien vanaf snelheid 0
-    draai(false, 50, false);        // draai achteruit aan snelheid 50
-    Serial.println("achteruit");    // print op de seriele monitor "achteruit"
+    draai(stand, 50, false, 0);        // draai achteruit aan snelheid 50
+    /*Serial.println(stand);    // print op de seriele monitor "achteruit"*/
     if(digitalRead(eind1) == 1){    // als de eerste eindeloopschakelaar opnieuw wordt ingedrukt
-      stand = "vooruit";            // verander de stand naar "vooruit"
+      stand = "omhoog";            // verander de stand naar "vooruit"
       hasRun = false;               // verander hasRun naar false om volgende keer vloeiend te draaien
     }                               // de while-lus wordt dan ook afgebroken
   }
@@ -89,26 +92,40 @@ int motor(int vsnel, int asnel){
 
 // functie om motor vooruit of achteruit te laten draaien aan bepaalde snelheid
 // en hem al dan niet vloeiend laten bewegen volgens parameters (vooruit, snelheid, vloei)
-int draai(int vooruit, int snelheid, int vloei) {
-  if (vooruit == true){                                         // als waarde vooruit true is
+int draai(int stand, int snelheid, int vloei, int vloeiSnelheid) {
+  if (stand == "omhoog"){                                         // als waarde vooruit true is
     if (vloei == true){                                         // als waarde vloei true is
-      // doe het volgende voor iedere snelheid tot snelheid < of = 255 en pas snelheid telkens met 10 aan
-      for(snelheid = 1; snelheid <= 255; snelheid += 10){       
-        motor(snelheid, 0);                                     // laat motor aan die snelheid vooruit draaien
+      // doe het volgende voor iedere snelheid tot snelheid < of = 255 en pas snelheid telkens met 10 aanµ
+      while(snelheid <= vloeiSnelheid) {
+        motor(snelheid, 0);
+        Serial.println(snelheid);
+        snelheid += 5;
+        delay(25);
       }
+      /*for(snelheid = 1; snelheid <= 255; snelheid += 10){       
+        motor(snelheid, 0);                                     // laat motor aan die snelheid vooruit draaien
+      }*/
     }
     else {                                                      // als waarde vloei niet true is
         motor(snelheid, 0);                                     // draai aan vaste snelheid meegegeven in parameter
+        Serial.println(snelheid);
     }
   }
-  else {                                                        // als waarde vooruit niet true is
+  else if (stand == "omlaag") {                                                        // als waarde vooruit niet true is
     if (vloei == true){                                         // als waarde vloei true is
-      for(snelheid = 1; snelheid <= 50; snelheid += 5){         // stel snelheid vloeibaar in
-        motor(0, snelheid);                                     // draai achteruit aan snelheid
+      while(snelheid <= vloeiSnelheid) {
+        motor(0, snelheid);
+        Serial.println(snelheid);
+        snelheid += 5;
+        delay(25);
       }
+      /*for(snelheid = 1; snelheid <= 50; snelheid += 5){         // stel snelheid vloeibaar in
+        motor(0, snelheid);                                     // draai achteruit aan snelheid
+      }*/
     }
     else {                                                      // als waarde vloei niet true is (false)
       motor(0, snelheid);                                       // draai achteruit aan vaste snelheid
+      Serial.println(snelheid);
     }
   }
 } 
@@ -116,11 +133,29 @@ int draai(int vooruit, int snelheid, int vloei) {
 // een functie om vloeiend te stoppen
 int vloeiStop(int remSnelheid, int remStand){
   // doe het volgende voor iedere remSnelheid tot remSnelheid < of = 0 en verminder telkens met 10
-  for(remSnelheid; remSnelheid <= 0; remSnelheid -=10){
-    if(remStand == "vooruit"){                                  // als remStand "vooruit" is
-      motor(remSnelheid, 0);                                    // draai met remSnelheid vooruit
-    } else if (remStand == "achteruit"){                        // als remStand "achteruit" is
-      motor(0, remSnelheid);                                    // draai met remSnelheid achteruit
+  if(remStand == "omlaag"){
+    while(remSnelheid >= 0) {
+      motor(remSnelheid, 0);
+      Serial.println(remSnelheid);
+      remSnelheid -=5;
+      delay(25);
+    } 
+  } else if (remStand == "omhoog"){                           // als remStand "omhoog" is
+     while(remSnelheid >= 0) {
+      motor(0, remSnelheid);
+      Serial.println(remSnelheid);
+      remSnelheid -= 5;
+      delay(25);
     }
   }
 }
+
+/*
+andere mogelijkeheden
+
+while(remSnelheid >= 0) {
+  motor(remSnelheid, 0);
+  remSnelheid -=5;
+  delay(25);
+}
+ */
