@@ -100,7 +100,7 @@ int draai(int stand, int snelheid, int vloei, int vloeiSnelheid) {
         motor(snelheid, 0);
         Serial.println(snelheid);
         snelheid += 5;
-        delay(25);
+        delay(50);
       }
       /*for(snelheid = 1; snelheid <= 255; snelheid += 10){       
         motor(snelheid, 0);                                     // laat motor aan die snelheid vooruit draaien
@@ -117,7 +117,7 @@ int draai(int stand, int snelheid, int vloei, int vloeiSnelheid) {
         motor(0, snelheid);
         Serial.println(snelheid);
         snelheid += 5;
-        delay(25);
+        delay(50);
       }
       /*for(snelheid = 1; snelheid <= 50; snelheid += 5){         // stel snelheid vloeibaar in
         motor(0, snelheid);                                     // draai achteruit aan snelheid
@@ -138,14 +138,14 @@ int vloeiStop(int remSnelheid, int remStand){
       motor(remSnelheid, 0);
       Serial.println(remSnelheid);
       remSnelheid -=5;
-      delay(25);
+      delay(50);
     } 
   } else if (remStand == "omhoog"){                           // als remStand "omhoog" is
      while(remSnelheid >= 0) {
       motor(0, remSnelheid);
       Serial.println(remSnelheid);
       remSnelheid -= 5;
-      delay(25);
+      delay(50);
     }
   }
 }
