@@ -1,4 +1,4 @@
- /*
+  /*
   * deze code bevat functies om onnodige herhaling te vermijden
   */
 
@@ -12,6 +12,9 @@ const int eind2 = 22;     // pin van input tweede eindeloopschakelaar
 // maak variabele aan voor status shakelaars
 char eind1Status = 0;     // variabele voor status eindeloopschakelaar 1
 char eind2Status = 0;     // variabele voor status eindeloopschakelaar 2
+
+int snelOmhoog = 150;
+int snelOmlaag = 35;
 
 int stand;                // maak variabele "stand" aan voor de status van de eindeloopschakelaars
 int hasRun = false;       // maak variabele aan om te checken of programma al gedraaid heeft
@@ -33,7 +36,7 @@ void setup() {
 // dit wordt herhaald
 void loop() {
 
-  draai("omlaag", 35, false, 0);          // draai eerst omlaag aan snelheid 50
+  draai("omlaag", snelOmlaag, false, 0);          // draai eerst omlaag aan snelheid 50
 
   // als eindeloopschakelaar 1 wordt ingedrukt (1, HIGH), verander variabele "stand" naar omhoog
   if(digitalRead(eind1) == 1) {
@@ -50,11 +53,11 @@ void loop() {
   while(stand == "omhoog"){
     if(hasRun == false) {           // als hasRun false is
       Serial.println(hasRun);
-      vloeiStop(50 ,"omlaag", 25);      // stop vloeiend van de "omlaag" stand, startend met snelheid 50
-      draai(stand, 0, true, 150);        // start vloeiend omhoog tot snelheid 255
+      vloeiStop(snelOmlaag ,"omlaag", 25);      // stop vloeiend van de "omlaag" stand, startend met snelheid 50
+      draai(stand, 1, true, snelOmhoog);        // start vloeiend omhoog tot snelheid 255
       hasRun = true;                // verander hasRun naar true, om niet nog een keer vloeiend
     }                               // te draaien vanaf snelheid 0
-    draai(stand, 150, false, 0);       // draai omhoog aan snelheid 255
+    draai(stand, snelOmhoog, false, 0);       // draai omhoog aan snelheid 255
     /*Serial.println(stand);          // print de stand op de seriële monitor*/
     if(digitalRead(eind2) == 1){    // als de tweede eindeloopschakelaar wordt ingedrukt
       stand = "omlaag";             // verander de stand naar "omlaag"
@@ -66,11 +69,11 @@ void loop() {
   while(stand == "omlaag"){
     if(hasRun == false){            // als hasRun false is
       Serial.println(hasRun);
-      vloeiStop(150, "omhoog", 25);     // stop vloeiend van de "omhoog" stand, startend met snelheid 255
-      draai(stand, 0, true, 35);        // start vloeiend achteruit tot snelheid 50
+      vloeiStop(snelOmhoog, "omhoog", 25);     // stop vloeiend van de "omhoog" stand, startend met snelheid 255
+      draai(stand, 1, true, snelOmlaag);        // start vloeiend achteruit tot snelheid 50
       hasRun = true;                // verander hasRun naar true, om niet nog een keer vloeiend
     }                               // te draaien vanaf snelheid 0
-    draai(stand, 35, false, 0);        // draai achteruit aan snelheid 50
+    draai(stand, snelOmlaag, false, 0);        // draai achteruit aan snelheid 50
     /*Serial.println(stand);    // print op de seriele monitor "achteruit"*/
     if(digitalRead(eind1) == 1){    // als de eerste eindeloopschakelaar opnieuw wordt ingedrukt
       stand = "omhoog";            // verander de stand naar "vooruit"
@@ -99,7 +102,7 @@ int draai(int stand, int snelheid, int vloei, int vloeiSnelheid) {
       while(snelheid <= vloeiSnelheid) {
         motor(0, snelheid);
         Serial.println(snelheid);
-        snelheid += 5;
+        snelheid *= 2;
         delay(50);
       }
     }
@@ -113,7 +116,7 @@ int draai(int stand, int snelheid, int vloei, int vloeiSnelheid) {
       while(snelheid <= vloeiSnelheid) {
         motor(snelheid, 0);
         Serial.println(snelheid);
-        snelheid += 5;
+        snelheid *= 2;
         delay(50);
       }
     }
