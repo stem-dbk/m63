@@ -9,6 +9,8 @@ int LPWM_Output = 6;      // Reverse Level PWM output pin, geconnecteerd met de 
 const int eind1 = 21;     // pin van input eerste eindeloopschakelaar
 const int eind2 = 22;     // pin van input tweede eindeloopschakelaar
 
+const int potentioSen = 18;   // Arduino analog input pin 18 = A18; middelste pinnetje
+
 // maak variabele aan voor status shakelaars
 char eind1Status = 0;     // variabele voor status eindeloopschakelaar 1
 char eind2Status = 0;     // variabele voor status eindeloopschakelaar 2
@@ -37,7 +39,7 @@ void setup() {
 void loop() {
   
   // draai(stand, snelheid, vloeiend, startsnelheid vloeiende beweging)
-  draai("omlaag", snelOmlaag, false, 0);          // draai eerst omlaag aan snelheid van variabele snelOmlaag
+  draai("omlaag", potentioOmlaag(), false, 0);          // draai eerst omlaag aan snelheid van variabele snelOmlaag
 
   // als eindeloopschakelaar 1 wordt ingedrukt (1, HIGH), verander variabele "stand" naar omhoog
   if(digitalRead(eind1) == 1) {
@@ -54,11 +56,11 @@ void loop() {
   while(stand == "omhoog"){
     if(hasRun == false) {           // als hasRun false is
       Serial.println(hasRun);       // print hasRun status
-      vloeiStop(snelOmlaag ,"omlaag", 25);      // stop vloeiend in 25ms van "omlaag", startend met huidige snelheid 
-      draai(stand, 1, true, snelOmhoog);        // start vloeiend vanaf snelheid 1 omhoog tot snelheid snelOmhoog
+      vloeiStop(potentioOmlaag() ,"omlaag", 25);      // stop vloeiend in 25ms van "omlaag", startend met huidige snelheid 
+      draai(stand, 1, true, potentioOmhoog());        // start vloeiend vanaf snelheid 1 omhoog tot snelheid snelOmhoog
       hasRun = true;                // verander hasRun naar true, om niet nog een keer vloeiend te stoppen en draaien
     }                               
-    draai(stand, snelOmhoog, false, 0);       // draai omhoog aan snelheid snelOmhoog, niet vloeiend
+    draai(stand, potentioOmhoog(), false, 0);       // draai omhoog aan snelheid snelOmhoog, niet vloeiend
     if(digitalRead(eind2) == 1){    // als de tweede eindeloopschakelaar wordt ingedrukt
       stand = "omlaag";             // verander de stand naar "omlaag"
       hasRun = false;               // verander hasRun naar false om volgende keer vloeiend te stoppen
@@ -70,10 +72,10 @@ void loop() {
     if(hasRun == false){            // als hasRun false is
       Serial.println(hasRun);       // print hasRun status
       vloeiStop(snelOmhoog, "omhoog", 25);     // stop vloeiend in 25ms van "omhoog", startend met huidige snelheid 
-      draai(stand, 1, true, snelOmlaag);       // start vloeiend vanaf snelheid 1 omlaag tot snelheid snelOmlaag
+      draai(stand, 1, true, potentioOmlaag());       // start vloeiend vanaf snelheid 1 omlaag tot snelheid snelOmlaag
       hasRun = true;                // verander hasRun naar true, om niet nog een keer vloeiend te draaien
     }                              
-    draai(stand, snelOmlaag, false, 0);        // draai omlaag aan snelheid snelOmlaag, niet vloeiend
+    draai(stand, potentioOmlaag(), false, 0);        // draai omlaag aan snelheid snelOmlaag, niet vloeiend
     if(digitalRead(eind1) == 1){    // als de eerste eindeloopschakelaar opnieuw wordt ingedrukt
       stand = "omhoog";             // verander de stand naar "omhoog"
       hasRun = false;               // verander hasRun naar false om volgende keer vloeiend te draaien
@@ -146,5 +148,52 @@ int vloeiStop(int remSnelheid, int remStand, int remTijd){
       remSnelheid -= 5;                         // verminder remSnelheid met 5
       delay(remTijd);                           // wacht "remTijd" ms
     }
+  }
+}
+
+// een functie voor aanpasbare snelheid
+potentio(){
+  int potentioVal = analogRead(potentioSen);
+  int rangeVal = 512/35;
+  if(potentioVal < 512){
+    snelOmlaag = 35 - (-(potentioVal-512)/rangeVal);
+    snelOmhoog = 150 - (-(potentioVal-512)/rangeVal);
+    break;
+  } else if (potentioVal > 512){
+    snelOmlaag = 35 + (potentioVal-512)/rangeVal;
+    snelOmhoog = 150 + (-(potentioVal-512)/rangeVal);
+    break;
+  } else if(potentioVal = 512){
+    snelOmlaag = 35;
+    snelOmhoog = 150;
+    break;
+  }
+}
+
+potentioOmlaag(){
+  int potentioVal = analogRead(potentioSen);
+  int rangeVal = 512/35;
+  if(potentioVal < 512){
+    return(35 - (-(potentioVal-512)/rangeVal));
+    break;
+  } else if (potentioVal > 512){
+    return(35 + (potentioVal-512)/rangeVal);
+    break;
+  } else if(potentioVal = 512){
+    return(35);
+  }
+}
+
+potentioOmhoog(){
+  int potentioVal = analogRead(potentioSen);
+  int rangeVal = 512/35;
+  if(potentioVal < 512){
+    return(150 - (-(potentioVal-512)/rangeVal));
+    break;
+  } else if (potentioVal > 512){
+    return(150 + (potentioVal-512)/rangeVal);
+    break;
+  } else if(potentioVal = 512){
+    return(150);
   }
 }
