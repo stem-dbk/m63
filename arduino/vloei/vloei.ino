@@ -152,47 +152,40 @@ int vloeiStop(int remSnelheid, int remStand, int remTijd){
 }
 
 // een functie voor aanpasbare snelheid
-potentio(){
+int potentio(){
   int potentioVal = analogRead(potentioSen);
   int rangeVal = 512/35;
   if(potentioVal < 512){
     snelOmlaag = 35 - (-(potentioVal-512)/rangeVal);
     snelOmhoog = 150 - (-(potentioVal-512)/rangeVal);
-    break;
   } else if (potentioVal > 512){
     snelOmlaag = 35 + (potentioVal-512)/rangeVal;
     snelOmhoog = 150 + (-(potentioVal-512)/rangeVal);
-    break;
   } else if(potentioVal = 512){
     snelOmlaag = 35;
     snelOmhoog = 150;
-    break;
   }
 }
 
-potentioOmlaag(){
+int potentioOmlaag(){
   int potentioVal = analogRead(potentioSen);
   int rangeVal = 512/35;
   if(potentioVal < 512){
     return(35 - (-(potentioVal-512)/rangeVal));
-    break;
   } else if (potentioVal > 512){
     return(35 + (potentioVal-512)/rangeVal);
-    break;
   } else if(potentioVal = 512){
     return(35);
   }
 }
 
-potentioOmhoog(){
+int potentioOmhoog(){
   int potentioVal = analogRead(potentioSen);
   int rangeVal = 512/35;
   if(potentioVal < 512){
     return(150 - (-(potentioVal-512)/rangeVal));
-    break;
   } else if (potentioVal > 512){
     return(150 + (potentioVal-512)/rangeVal);
-    break;
   } else if(potentioVal = 512){
     return(150);
   }
