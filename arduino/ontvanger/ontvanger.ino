@@ -24,7 +24,7 @@ void setup()
 void loop()
 {
     // Set buffer to size of expected message
-    uint8_t buf[24];
+    uint8_t buf[22];
     uint8_t buflen = sizeof(buf);
     // Check if received packet is correct size
     if (rf_driver.recv(buf, &buflen))
