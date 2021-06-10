@@ -104,7 +104,7 @@ int draai(int stand, int snelheid, int vloei, int vloeiSnelheid) {
       while(snelheid <= vloeiSnelheid) {
         motor(0, snelheid);                                     // laat motor omhoog draaien aan "snelheid"
         Serial.println(snelheid);                               // print "snelheid"
-        snelheid *= 2;                                          // vermenigvuldig "snelheid" met factor 2
+        snelheid += 5;                                          // vermenigvuldig "snelheid" met factor 2
         delay(50);                                              // wacht 50 ms
       }
     }
@@ -120,7 +120,7 @@ int draai(int stand, int snelheid, int vloei, int vloeiSnelheid) {
       while(snelheid <= vloeiSnelheid) {
         motor(snelheid, 0);                                     // laat motor omlaag draaien aan "snelheid"
         Serial.println(snelheid);                               // print "snelheid"
-        snelheid *= 2;                                          // vermenigvuldig "snelheid" met factor 2
+        snelheid += 5;                                          // vermenigvuldig "snelheid" met factor 2
         delay(50);                                              // wacht 50 ms
       }
     }
