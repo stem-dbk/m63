@@ -6,8 +6,8 @@
 int RPWM_Output = 5;      // Forward Level PWM output pin, geconnecteerd met de H-brug
 int LPWM_Output = 6;      // Reverse Level PWM output pin, geconnecteerd met de H-brug
 
-const int eind1 = 21;     // pin van input eerste eindeloopschakelaar
-const int eind2 = 22;     // pin van input tweede eindeloopschakelaar
+const int eind1 = 22;     // pin van input eerste eindeloopschakelaar
+const int eind2 = 21;     // pin van input tweede eindeloopschakelaar
 
 const int potentioSen = 18;   // Arduino analog input pin 18 = A18; middelste pinnetje
 
@@ -104,7 +104,8 @@ int draai(int stand, int snelheid, int vloei, int vloeiSnelheid) {
       while(snelheid <= vloeiSnelheid) {
         motor(0, snelheid);                                     // laat motor omhoog draaien aan "snelheid"
         Serial.println(snelheid);                               // print "snelheid"
-        snelheid += 5;                                          // vermenigvuldig "snelheid" met factor 2
+        Serial.println("omhoog");
+        snelheid += 10;                                          // vermenigvuldig "snelheid" met factor 2
         delay(50);                                              // wacht 50 ms
       }
     }
@@ -120,7 +121,8 @@ int draai(int stand, int snelheid, int vloei, int vloeiSnelheid) {
       while(snelheid <= vloeiSnelheid) {
         motor(snelheid, 0);                                     // laat motor omlaag draaien aan "snelheid"
         Serial.println(snelheid);                               // print "snelheid"
-        snelheid += 5;                                          // vermenigvuldig "snelheid" met factor 2
+        Serial.println("omlaag");
+        snelheid += 10;                                          // vermenigvuldig "snelheid" met factor 2
         delay(50);                                              // wacht 50 ms
       }
     }
@@ -138,14 +140,14 @@ int vloeiStop(int remSnelheid, int remStand, int remTijd){
     while(remSnelheid >= 0) {                   // zolang remSnelheid groter is dan 0
       motor(remSnelheid, 0);                    // draai omlaag aan remSnelheid
       Serial.println(remSnelheid);              // print "remSnelheid"
-      remSnelheid -= 5;                         // verminder remSnelheid met 5
+      remSnelheid -= 10;                         // verminder remSnelheid met 5
       delay(remTijd);                           // wacht "remTijd" ms
     } 
   } else if (remStand == "omhoog"){             // als "remStand" omhoog is
      while(remSnelheid >= 0) {                  // zolang remSnelheid groter is dan 0
       motor(0, remSnelheid);                    // draai omhoog aan remSnelheid
       Serial.println(remSnelheid);              // print "remSnelheid"
-      remSnelheid -= 5;                         // verminder remSnelheid met 5
+      remSnelheid -= 10;                         // verminder remSnelheid met 5
       delay(remTijd);                           // wacht "remTijd" ms
     }
   }
